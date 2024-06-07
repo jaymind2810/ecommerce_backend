@@ -9,12 +9,16 @@ class ProductListAPIView(APIView):
     API endpoint for listing and creating products.
     """
 
-    def get(self, request, format=None):
+    def get(self, request):
         """
         Retrieves a list of all products.
         """
+
+        print("--------In GEt--AllProducts---------------------------")
         products = Product.objects.all()
+        print(products, "-----products---------")
         serializer = ProductSerializer(products, many=True)
+        print(serializer.data, "-----------data------------")
         return Response({"status": "success", "data": serializer.data}, status=200)
 
     def post(self, request, format=None):

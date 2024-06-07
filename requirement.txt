@@ -2,3 +2,4 @@ django
 django-rest-framework
 psycopg2-binary
 pillow
+django-cors-headers
