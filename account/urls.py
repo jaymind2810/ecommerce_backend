@@ -7,12 +7,8 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     # # =========== Rest API ==================
-    # path('basic/', StudentView.as_view()),
-    # path('basic/<int:id>/', StudentView.as_view()),
-
-    # # ========== Serializer Use Case =================
-    # path('student/', views.student_list, name='student_list'),
-    # path('student/<int:pk>/', views.student_detail, name='student_detail'),
+    path('auth/register/', UserRegistrationAPIView.as_view()),
+    path('auth/login/', UserLoginAPIView.as_view()),
 
 ]
 
