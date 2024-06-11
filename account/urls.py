@@ -3,12 +3,18 @@ from . import views
 from .views import *
 from django.conf import settings
 from django.conf.urls.static import static
+from rest_framework_simplejwt import views as jwt_views
 
 
 urlpatterns = [
-    # # =========== Rest API ==================
-    path('auth/register/', UserRegistrationAPIView.as_view()),
-    path('auth/login/', UserLoginAPIView.as_view()),
+    # ============= JWT Authentication Login Api================
+
+    # path('token/', jwt_views.TokenObtainPairView.as_view(), name ='token_obtain_pair'),
+    path('token/refresh/', jwt_views.TokenRefreshView.as_view(), name ='token_refresh'),
+    path('auth/register/', UserRegistrationAPIView.as_view(), name='register'),
+    # path('auth/login/', UserLoginAPIView.as_view()),
+    path('auth/login/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
+    # path('auth/logout/', LogoutView.as_view(), name='logout'),
 
 ]
 

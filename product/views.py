@@ -3,11 +3,13 @@ from rest_framework.response import Response
 from rest_framework import status  # Import for handling HTTP status codes
 from .serializers import ProductSerializer  # Import your product serializer
 from .models import Product  # Import your Product model
+from rest_framework.permissions import IsAuthenticated 
 
 class ProductListAPIView(APIView):
     """
     API endpoint for listing and creating products.
     """
+    permission_classes = (IsAuthenticated,)
 
     def get(self, request):
         """
@@ -32,6 +34,7 @@ class ProductDetailAPIView(APIView):
     """
     API endpoint for retrieving, updating, and deleting an individual product.
     """
+    permission_classes = (IsAuthenticated,)
 
     def get_object(self, pk):
         try:
