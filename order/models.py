@@ -3,10 +3,7 @@ from account.models import User
 from product.models import Product
 
 class Order(models.Model):
-    """
-    Model for managing orders in a Django application.
-    """
-
+    
     # Order identification and metadata
     order_id = models.CharField(max_length=50, unique=True, primary_key=True)
     customer = models.ForeignKey('account.User', on_delete=models.CASCADE, related_name='orders')  # User who placed the order
