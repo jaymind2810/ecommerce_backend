@@ -3,6 +3,12 @@ from .models import Product, ProductImages, Category, Comment
 from django.utils.html import format_html
 # Register your models here.
 
+
+class ProductImageInline(admin.TabularInline):
+    model = ProductImages
+    extra = 1  # Number of extra forms to display
+
+
 class ProductAdmin(admin.ModelAdmin):
 
     def thumbnail(self, object):
@@ -10,29 +16,30 @@ class ProductAdmin(admin.ModelAdmin):
 
     thumbnail.short_description = 'Product Photo'
 
-    list_display = ('id', 'thumbnail', 'name', 'product_sequence', 'short_text', 'amount', 'last_modified', 'create_date', 'category_id', 'create_by')
+    list_display = ('id', 'thumbnail', 'name', 'product_sequence', 'short_text', 'unit_price', 'last_modified', 'create_date', 'category_id', 'create_by')
     list_display_links = ('id', 'name', 'short_text')
     # list_editable = ('publish_status',)
     search_fields = ('id', 'name', 'short_text', 'product_sequence', 'create_date', 'category_id', 'create_by')
     list_filter = ('category_id', 'create_by', 'publish_status')
+    inlines = [ProductImageInline]
 
     fieldsets = [
         ('Standard info', {
             'fields': ['name', 'product_sequence']
         }),
         ('Product Details', {
-            'fields': ['short_text', 'description', 'amount', 'category_id',
-                       'manufacturer_name', 'manufacturer_brand','product_stock', 'product_price',
-                       'publish_status', 'visibility', 'last_published_date_time'],
+            'fields': ['short_text', 'description', 'unit_price', 'category_id',
+                       'manufacturer_name', 'manufacturer_brand','product_stock', 'cost_price',
+                        ],
             'classes': ['wide',],
             'description': 'Enter the main details of the model.',
         }),
-        ('Product Images', {
-            'fields': ['product_photo', 'product_photo_1']
+        ('Other Details', {
+            'fields': ['publish_status', 'visibility','last_published_date_time', 'create_by']
         }),
-        # ('Other Details', {
-        #     'fields': ['create_by', 'create_date', 'last_modified']
-        # }),
+        ('Product Image', {
+            'fields': ['product_photo']
+        })
     ]
 
 class ProductImagesAdmin(admin.ModelAdmin):
@@ -55,6 +62,7 @@ class CategoryAdmin(admin.ModelAdmin):
     # list_editable = ('is_featured',)
     search_fields = ('id', 'name', 'description', 'create_date')
     list_filter = ('create_date',)
+
 
 
 

@@ -34,23 +34,17 @@ class Product(models.Model):
     ]
 
     name = models.CharField(max_length=128)
-    short_text = models.CharField(max_length=128)
+    short_text = models.CharField(max_length=254)
     description = models.TextField()
-    amount = models.CharField(default="1", max_length=10)
+    unit_price = models.CharField(default="1", max_length=10)
     product_photo = models.ImageField(upload_to='products/', blank=True, default='products/img-6.png')
-    product_photo_1 = models.ImageField(upload_to='products/', blank=True)
-
-    # date = models.CharField(max_length=15)
-    # time = models.CharField(max_length=12, default="00:00")
-    # act = models.IntegerField(default=0)
-    # rand = models.IntegerField(default=0)
 
     category_id = models.ForeignKey(Category, on_delete=models.CASCADE, null=True)
 
     manufacturer_name = models.CharField(max_length=128, blank=True)
     manufacturer_brand = models.CharField(max_length=128, blank=True)
     product_stock = models.CharField(max_length=128, blank=True)
-    product_price = models.CharField(max_length=128, blank=True)
+    cost_price = models.CharField(max_length=128, blank=True)
     publish_status = models.CharField(choices=publish_choices, default='Draft', max_length=15)
     visibility = models.CharField(choices=visibility_choices, default='Draft', max_length=15)
 

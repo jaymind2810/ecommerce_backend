@@ -45,12 +45,10 @@ class UserLoginAPIView(APIView):
         username = request.data.get('username')
         password = request.data.get('password')
         
-        print(username, password, "=======UserName========")
         if not username or not password:
             return Response({'error': 'Username and password are required'}, status=status.HTTP_400_BAD_REQUEST)
 
         user = authenticate(username=username, password=password)
-        print(user, "==user00000")
         if not user:
             return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 

@@ -12,9 +12,11 @@ urlpatterns = [
     # path('token/', jwt_views.TokenObtainPairView.as_view(), name ='token_obtain_pair'),
     path('token/refresh/', jwt_views.TokenRefreshView.as_view(), name ='token_refresh'),
     path('auth/register/', UserRegistrationAPIView.as_view(), name='register'),
-    # path('auth/login/', UserLoginAPIView.as_view()),
     path('auth/login/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
     # path('auth/logout/', LogoutView.as_view(), name='logout'),
+
+    # ============= Users Api================
+    path('auth/user/', UserRetrieveUpdateAPIView.as_view(), name='user_profile'),
 
 ]
 

@@ -20,7 +20,7 @@ class Order(models.Model):
         ('returned', 'Returned'),
     )
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
-    tracking_number = models.CharField(max_length=50, blank=True, null=True)  # Optional tracking number
+    tracking_number = models.CharField(max_length=50, blank=True, null=True) 
 
     # Billing and shipping information
     billing_address = models.TextField()  # Can be structured with separate fields for street address, city, state, etc.
