@@ -40,14 +40,12 @@ class CartItemDetailAPIView(APIView):
             return None
 
     def get(self, request, pk):
-        print("Here-----------")
         cart_items = self.get_object(pk)
-        print(cart_items,"-------_CartItem------------")
         serializer = CartItemSerializer(cart_items, many=True)
         return Response({"status": "success", "data": serializer.data}, status=200)
 
     def put(self, request, pk):
-        cart_item = self.get_object(pk)
+        cart_item = CartItem.objects.get(id=request.data['id'])
         serializer = CartItemSerializer(cart_item, data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -55,7 +53,7 @@ class CartItemDetailAPIView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, pk):
-        cart_item = self.get_object(pk)
+        cart_item = CartItem.objects.get(id=request.data['id'])
         cart_item.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
