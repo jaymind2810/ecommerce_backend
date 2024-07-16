@@ -11,7 +11,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from .models import CartItem
 from account.models import User
-from .serializers import CartItemSerializer
+from .serializers import CartItemSerializer, CartItemsSerializer
 
 
 
@@ -22,7 +22,7 @@ class CartItemListCreateAPIView(APIView):
         return Response({"status": "success", "data": serializer.data}, status=200)
 
     def post(self, request):
-        serializer = CartItemSerializer(data=request.data)
+        serializer = CartItemsSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response({"status": "success", "data": serializer.data}, status=status.HTTP_201_CREATED)
@@ -34,7 +34,6 @@ class CartItemDetailAPIView(APIView):
         try:
             user = User.objects.get(id=pk)
             cart = CartItem.objects.filter(user=user.id)
-            print(cart)
             return cart
         except CartItem.DoesNotExist:
             return None

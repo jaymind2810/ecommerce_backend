@@ -15,3 +15,6 @@ class CartItem(models.Model):
     # created_at = models.DateTimeField(default=datetime.datetime.now())
     # updated_at = models.DateTimeField(default=datetime.datetime.now())
 
+    class Meta:
+        unique_together = ('product', 'user',)
+
