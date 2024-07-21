@@ -5,7 +5,7 @@ from django.contrib.auth.models import Permission
 
 class CartItemAdmin(admin.ModelAdmin):
 
-    list_display = ('id', 'product', 'quantity')
+    list_display = ('id', 'product', 'quantity', 'updated_at')
     list_display_links = ('id',)
 
 
