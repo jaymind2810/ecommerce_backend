@@ -18,6 +18,10 @@ urlpatterns = [
     path('cart-items/', CartItemListCreateAPIView.as_view(), name='cartitem-list-create'),
     path('cart-items/<int:pk>/', CartItemDetailAPIView.as_view(), name='cartitem-detail'),
 
+    # ============ Addresss ========================
+    path('address/', AddressListAPIView.as_view(), name='address-list-create'),
+    path('address/<int:pk>/', AddressDetailAPIView.as_view(), name='address-detail'),
+
 ]
 
 if settings.DEBUG:  # new

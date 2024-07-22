@@ -56,17 +56,3 @@ class Main(models.Model):
     def __str__(self):
         return self.set_name + " | "+ str(self.pk)
 
-
-class Address(models.Model):
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
-    street = models.CharField(max_length=255)
-    city = models.CharField(max_length=100)
-    state = models.CharField(max_length=100)
-    country = models.CharField(max_length=100)
-    postal_code = models.CharField(max_length=20)
-    phone_number = models.CharField(max_length=20,default="-")
-    Email = models.CharField(max_length=20, default="-")
-    is_delete = models.BooleanField(max_length=20, default=False)
-
-    def __str__(self):
-        return f'{self.street}, {self.city}, {self.state}, {self.country}, {self.postal_code}'

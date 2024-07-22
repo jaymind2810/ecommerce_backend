@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Main, User, Address
+from .models import Main, User
 from django.contrib.auth.models import Permission
 
 # Register your models here.
@@ -32,13 +32,8 @@ class MainAdmin(admin.ModelAdmin):
     # search_fields = ('id', 'name', 'description', 'create_date')
     # list_filter = ('create_date',)
 
-class AddressAdmin(admin.ModelAdmin):
-
-    list_display = ('id', 'user_id','country')
-    list_display_links = ('id',)
 
 
 admin.site.register(User, CustomUserAdmin)
 admin.site.register(Main, MainAdmin)
-admin.site.register(Address, AddressAdmin)
 admin.site.register(Permission)
