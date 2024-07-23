@@ -11,11 +11,11 @@ class CartItemAdmin(admin.ModelAdmin):
 
 class AddressAdmin(admin.ModelAdmin):
 
-    list_display = ('id', 'user_id','country')
-    list_display_links = ('id',)
+    list_display = ('id', 'name', 'phone_number', 'user_id','country')
+    list_display_links = ('id','name')
     fieldsets = (
         ('User Contact Info', {'fields': ('user_id', 'phone_number', 'email')}),
-        ('Address Info', {'fields': ('street', 'city', 'state', 'country', 'postal_code')}),
+        ('Address Info', {'fields': ('name', 'street', 'city', 'state', 'country', 'postal_code')}),
         ('Other Info', {'fields': ('is_delete',)}),
     )
 

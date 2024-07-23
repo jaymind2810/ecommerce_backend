@@ -19,6 +19,7 @@ class CartItem(models.Model):
 
 class Address(models.Model):
     user_id = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    name = models.CharField(max_length=128, null=True)
     street = models.CharField(max_length=255)
     city = models.CharField(max_length=100)
     state = models.CharField(max_length=100)
