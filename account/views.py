@@ -3,7 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token 
 from rest_framework.permissions import IsAuthenticated 
-from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.decorators import api_view
 from django.contrib.auth import authenticate, login  # For login functionality
 
 from .serializers import (
@@ -14,6 +14,10 @@ from .serializers import (
 from .models import User  # Import your User model (if not using Django's default)
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
+)
+
+from .utils import (
+    getUserAllData
 )
 
 class CustomTokenObtainPairView(TokenObtainPairView):
@@ -93,3 +97,13 @@ class UserRetrieveUpdateAPIView(APIView):
             serializer.save()
             return Response({"status": "success", "data": serializer.data}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+@api_view(['GET'])
+def getAllData(self, pk):
+    try:
+        user_all_data = getUserAllData(pk)
+        data = {"status": "success", "data": user_all_data, "message": "User All Data Get"}
+        return Response(data, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_403_FORBIDDEN)

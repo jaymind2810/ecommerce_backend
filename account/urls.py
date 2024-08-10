@@ -18,6 +18,8 @@ urlpatterns = [
     # ============= Users Api================
     path('auth/user/', UserRetrieveUpdateAPIView.as_view(), name='user_profile'),
 
+    path('auth/getuseralldata/<int:pk>/', getAllData, name='getAllData'),
+
 ]
 
 if settings.DEBUG:  # new
