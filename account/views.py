@@ -17,61 +17,38 @@ from rest_framework_simplejwt.views import (
 )
 
 from .utils import (
-    getUserAllData
+    getUserAllData,
+    getAllHomePageData,
+    registerUser,
+    validateUserLoginData
 )
 
 class CustomTokenObtainPairView(TokenObtainPairView):
-    # Replace the serializer with your custom
+    # Login Validattion
     serializer_class = CustomTokenObtainPairSerializer
 
 class UserRegistrationAPIView(APIView):
     """
     API endpoint for user registration.
     """
-
     def post(self, request):
-        data = request.data
-        del data["password2"]
-        email = data['email']
-        data['username'] = email
-        serializer = RegisterSerializer(data=data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            response = registerUser(request)
+            return Response(response, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_403_FORBIDDEN)
+        
 
 class UserLoginAPIView(APIView):
     """
     API endpoint for user login.
     """
-
     def post(self, request, format=None):
-        username = request.data.get('username')
-        password = request.data.get('password')
-        
-        if not username or not password:
-            return Response({'error': 'Username and password are required'}, status=status.HTTP_400_BAD_REQUEST)
-
-        user = authenticate(username=username, password=password)
-        if not user:
-            return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
-
-        login(request, user)  # Log in the user
-        token, _ = Token.objects.get_or_create(user=user)  # Generate a token (if using token-based auth)
-        return Response({'token': token.key}, status=status.HTTP_200_OK)  # Return the token
-
-# class LogoutView(APIView):
-#      permission_classes = (IsAuthenticated,)
-#      def post(self, request):
-          
-#         try:
-#             refresh_token = request.data["refresh_token"]
-#             token = RefreshToken(refresh_token)
-#             token.blacklist()
-#             return Response(status=status.HTTP_205_RESET_CONTENT)
-#         except Exception as e:
-#             return Response(status=status.HTTP_400_BAD_REQUEST)
-
+        try:
+            response = validateUserLoginData(request)
+            return Response(response, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_403_FORBIDDEN)
 
 
 class UserRetrieveUpdateAPIView(APIView):
@@ -102,8 +79,17 @@ class UserRetrieveUpdateAPIView(APIView):
 @api_view(['GET'])
 def getAllData(self, pk):
     try:
-        user_all_data = getUserAllData(pk)
-        data = {"status": "success", "data": user_all_data, "message": "User All Data Get"}
-        return Response(data, status=status.HTTP_200_OK)
+        response = getUserAllData(pk)
+        return Response(response, status=status.HTTP_200_OK)
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_403_FORBIDDEN)
+    
+
+class HomePageAllData(APIView):
+    # permission_classes = (IsAuthenticated,)
+    def get(self, request):
+        try:
+            response = getAllHomePageData(request)
+            return Response(response, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_403_FORBIDDEN)

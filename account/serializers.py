@@ -22,41 +22,46 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ('__all__')
         extra_kwargs = {'password': {'write_only': True}}
 
-    # def create(self, validated_data):
-        # user = User.objects.create_user(validated_data['username'], validated_data['email'], validated_data['password'])
-        # user.save()
-        # return user
-
     def update(self, instance, validated_data):
-        # instance.username = validated_data.get('username', instance.username)
-        # instance.email = validated_data.get('email', instance.email)
         instance.save()
         return instance
-
 
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 
     def validate(self, attrs):
-        print(attrs, "======attrs------------")
-        data = super(CustomTokenObtainPairSerializer, self).validate(attrs)
-        print(data, "========data=========")
-        token = self.get_token(self.user)
-        # if self._kwargs["data"]["rememberMe"]:
-        #     new_token = token.access_token
-        #     new_token.set_exp(lifetime=REMEMBER_ME_EXPIRY_TIME)
-        #     data["access"] = text_type(new_token)
-        # else:
-        #     data["access"] = text_type(token.access_token)
-        new_token = token.access_token
-        new_token.set_exp(lifetime=REMEMBER_ME_EXPIRY_TIME)
-        data["access"] = text_type(new_token)
+        try:
+            data = super(CustomTokenObtainPairSerializer, self).validate(attrs)
+            token = self.get_token(self.user)
+            # if self._kwargs["data"]["rememberMe"]:
+            #     new_token = token.access_token
+            #     new_token.set_exp(lifetime=REMEMBER_ME_EXPIRY_TIME)
+            #     data["access"] = text_type(new_token)
+            # else:
+            #     data["access"] = text_type(token.access_token)
+            new_token = token.access_token
+            new_token.set_exp(lifetime=REMEMBER_ME_EXPIRY_TIME)
+            data["access"] = text_type(new_token)
+            
+            data["userId"] = self.user.id
+            data["user"] = self.user.email
+            # data["is_baned"] = self.user.is_baned
+            # data["bane_type"] = self.user.bane_type
+            # return data
+            return {
+                "data": data,
+                "status": 200,
+                "message": "Login Successfully..!!",
+                "success": True,
+            }
         
-        data["userId"] = self.user.id
-        data["user"] = self.user.email
-        # data["is_baned"] = self.user.is_baned
-        # data["bane_type"] = self.user.bane_type
-        return data
+        except Exception as e:
+            return {
+                "data": {},
+                "status": 500,
+                "message": "Somthing went wrong",
+                "success": False,
+            }
 
 
 class RegisterSerializer(serializers.ModelSerializer):

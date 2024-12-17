@@ -2,105 +2,126 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 import stripe
-from django.conf import settings
-
 stripe.api_key = 'sk_test_51POKT1P2KIYLyQddL4wKfALiHpfAppLjcH8xYn6UUHAUnPREjtDFLsTwNLjdMV0ygqNoc65w4QhtsPpnUbUA3foq00yifkKMYf'
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .models import CartItem, Address
-from account.models import User
-from .serializers import CartItemSerializer, CartItemsSerializer, AddressSerializer
+from rest_framework.permissions import IsAuthenticated 
+from .utils import (
+    getAllCartItems,
+    getCartItemDetail,
+    createCartItem,
+    updateCartItem,
+    deleteCartItem,
+    getAllAddresss,
+    getAddressDetail,
+    createAddress,
+    updateAddress,
+    deleteAddress,
+)
 
 
+class CartItemListAPIView(APIView):
+    """
+    API endpoint for listing and creating CartItems.
+    """
+    permission_classes = (IsAuthenticated,)
 
-class CartItemListCreateAPIView(APIView):
     def get(self, request):
-        cart_items = CartItem.objects.all()
-        serializer = CartItemSerializer(cart_items, many=True)
-        return Response({"status": "success", "data": serializer.data}, status=200)
+        """
+        Retrieves a list of all CartItems.
+        """
+        try:
+            response = getAllCartItems(request)
+            return Response(response, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_403_FORBIDDEN)
 
-    def post(self, request):
-        serializer = CartItemsSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response({"status": "success", "data": serializer.data}, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def post(self, request, format=None):
+        """
+        Creates a new CartItem.
+        """
+        try:
+            response = createCartItem(request)
+            return Response(response, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_403_FORBIDDEN)
 
 
 class CartItemDetailAPIView(APIView):
-    def get_object(self, pk):
+    # permission_classes = (IsAuthenticated,)
+    def get(self, request, pk, format=None):
         try:
-            user = User.objects.get(id=pk)
-            cart = CartItem.objects.filter(user=user.id)
-            return cart
-        except CartItem.DoesNotExist:
-            return None
+            response = getCartItemDetail(request, pk)
+            return Response(response, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_403_FORBIDDEN)
 
-    def get(self, request, pk):
-        cart_items = self.get_object(pk)
-        serializer = CartItemSerializer(cart_items, many=True)
-        return Response({"status": "success", "data": serializer.data}, status=200)
+    def put(self, request, pk, format=None):
+        try:
+            response = updateCartItem(request, pk)
+            return Response(response, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_403_FORBIDDEN)
 
-    def put(self, request, pk):
-        cart_item = CartItem.objects.get(id=request.data['id'])
-        serializer = CartItemSerializer(cart_item, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def delete(self, request, pk):
-        cart_item = CartItem.objects.get(id=request.data['id'])
-        cart_item.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+    def delete(self, request, pk, format=None):
+        try:
+            response = deleteCartItem(request, pk)
+            return Response(response, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_403_FORBIDDEN)
 
 
 class AddressListAPIView(APIView):
-    def get(self, request, *args, **kwargs):
-        addresses = Address.objects.all()
-        serializer = AddressSerializer(addresses, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+    """
+    API endpoint for listing and creating Addresss.
+    """
+    permission_classes = (IsAuthenticated,)
 
-    def post(self, request, *args, **kwargs):
-        print(request.data, "--------Address Data--------")
-        serializer = AddressSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            data = {
-                "status": "success", 
-                "data": serializer.data,
-                "message": "New Address Added Successfully...!!"
-            }
-            return Response(data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def get(self, request):
+        """
+        Retrieves a list of all Addresss.
+        """
+        try:
+            response = getAllAddresss(request)
+            return Response(response, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_403_FORBIDDEN)
+
+    def post(self, request, format=None):
+        """
+        Creates a new Address.
+        """
+        try:
+            response = createAddress(request)
+            return Response(response, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_403_FORBIDDEN)
 
 
 class AddressDetailAPIView(APIView):
-    def get_object(self, pk):
-        user = User.objects.get(id=pk)
-        address = Address.objects.filter(user=user.id)
-        return address
-        
-    def get(self, request, pk, *args, **kwargs):
-        address = self.get_object(pk)
-        serializer = AddressSerializer(address, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+    # permission_classes = (IsAuthenticated,)
+    def get(self, request, pk, format=None):
+        try:
+            response = getAddressDetail(request, pk)
+            return Response(response, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_403_FORBIDDEN)
 
-    def put(self, request, pk, *args, **kwargs):
-        address = self.get_object(pk)
-        serializer = AddressSerializer(address, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def put(self, request, pk, format=None):
+        try:
+            response = updateAddress(request, pk)
+            return Response(response, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_403_FORBIDDEN)
 
-    def delete(self, request, pk, *args, **kwargs):
-        address = Address.objects.get(id=pk)
-        # address = self.get_object(pk)
-        address.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+    def delete(self, request, pk, format=None):
+        try:
+            response = deleteAddress(request, pk)
+            return Response(response, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_403_FORBIDDEN)
 
 
 @api_view(['POST'])

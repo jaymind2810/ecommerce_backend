@@ -15,7 +15,7 @@ urlpatterns = [
     # path('api/webhook', views.webhook_received, name='webhook'),
 
     # ============ Cart API =========================
-    path('cart-items/', CartItemListCreateAPIView.as_view(), name='cartitem-list-create'),
+    path('cart-items/', CartItemListAPIView.as_view(), name='cartitem-list-create'),
     path('cart-items/<int:pk>/', CartItemDetailAPIView.as_view(), name='cartitem-detail'),
 
     # ============ Addresss ========================

@@ -1,73 +1,84 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status  # Import for handling HTTP status codes
-from .serializers import ProductSerializer, ProductAlldataSerializer 
-from .models import Product  # Import your Product model
 from rest_framework.permissions import IsAuthenticated 
+from .utils import (
+    getAllProducts,
+    getProductDetail,
+    createProduct,
+    updateProduct,
+    deleteProduct,
+    getAllTrendingProducts,
+    getAllRelatedProducts,
+)
+
 
 class ProductListAPIView(APIView):
     """
     API endpoint for listing and creating products.
     """
-    permission_classes = (IsAuthenticated,)
+    # permission_classes = (IsAuthenticated,)
 
     def get(self, request):
         """
         Retrieves a list of all products.
         """
-
-        products = Product.objects.all()
-        serializer = ProductSerializer(products, many=True)
-        return Response({"status": "success", "data": serializer.data}, status=200)
+        try:
+            response = getAllProducts(request)
+            return Response(response, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_403_FORBIDDEN)
 
     def post(self, request, format=None):
         """
         Creates a new product.
         """
-        serializer = ProductSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            response = createProduct(request)
+            return Response(response, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_403_FORBIDDEN)
+
 
 class ProductDetailAPIView(APIView):
     # permission_classes = (IsAuthenticated,)
-
-    def get_object(self, pk):
-        try:
-            return Product.objects.get(pk=pk)
-        except Product.DoesNotExist:
-            return None
-
     def get(self, request, pk, format=None):
-        product = self.get_object(pk)
-        if not product:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-        serializer = ProductAlldataSerializer(product)
-        return Response({"status": "success", "data": serializer.data}, status=200)
+        try:
+            response = getProductDetail(request, pk)
+            return Response(response, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_403_FORBIDDEN)
 
     def put(self, request, pk, format=None):
-        product = self.get_object(pk)
-        if not product:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-        serializer = ProductAlldataSerializer(product, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response({"status": "success", "data": serializer.data}, status=200)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            response = updateProduct(request, pk)
+            return Response(response, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_403_FORBIDDEN)
 
     def delete(self, request, pk, format=None):
-        product = self.get_object(pk)
-        if not product:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-        product.delete()
-        # return Response(status=status.HTTP_204_NO_CONTENT)
-        return Response({"status": "success", "data": "Product Record Deleted"}, status=200)
+        try:
+            response = deleteProduct(request, pk)
+            return Response(response, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_403_FORBIDDEN)
     
 
 class TrendingProductListAPIView(APIView):
     # permission_classes = (IsAuthenticated,)
     def get(self, request):
-        products = Product.objects.filter(visibility='Public', publish_status='Published').order_by("?")[:4]
-        serializer = ProductSerializer(products, many=True)
-        return Response({"status": "success", "data": serializer.data}, status=200)
+        try:
+            response = getAllTrendingProducts(request)
+            return Response(response, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_403_FORBIDDEN)
+    
+
+class RelatedProductListAPIView(APIView):
+    # permission_classes = (IsAuthenticated,)
+    def get(self, request):
+        try:
+            response = getAllRelatedProducts(request)
+            return Response(response, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_403_FORBIDDEN)

@@ -1,61 +1,62 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .serializers import OrderSerializer  # Import your order serializer
-from .models import Order  # Import your Order model
+from rest_framework.permissions import IsAuthenticated 
+from .utils import (
+    getAllOrders,
+    getOrderDetail,
+    createOrder,
+    updateOrder,
+    deleteOrder,
+)
 
+    
 class OrderListAPIView(APIView):
+    """
+    API endpoint for listing and creating Orders.
+    """
+    permission_classes = (IsAuthenticated,)
 
-    def get(self, request, format=None):
+    def get(self, request):
         """
-        Retrieves a list of all orders.
+        Retrieves a list of all Orders.
         """
-        orders = Order.objects.all()
-        serializer = OrderSerializer(orders, many=True)
-        return Response({"status": "success", "data": serializer.data}, status=200)
+        try:
+            response = getAllOrders(request)
+            return Response(response, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_403_FORBIDDEN)
 
     def post(self, request, format=None):
         """
-        Creates a new order.
+        Creates a new Order.
         """
-        serializer = OrderSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            response = createOrder(request)
+            return Response(response, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_403_FORBIDDEN)
+
 
 class OrderDetailAPIView(APIView):
-    """
-    API endpoint for retrieving, updating, and deleting an individual order.
-    """
-
-    def get_object(self, pk):
-        try:
-            return Order.objects.get(pk=pk)
-        except Order.DoesNotExist:
-            return None
-
+    # permission_classes = (IsAuthenticated,)
     def get(self, request, pk, format=None):
-        order = self.get_object(pk)
-        if not order:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-        serializer = OrderSerializer(order)
-        return Response({"status": "success", "data": serializer.data}, status=200)
-    
+        try:
+            response = getOrderDetail(request, pk)
+            return Response(response, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_403_FORBIDDEN)
+
     def put(self, request, pk, format=None):
-        order = self.get_object(pk)
-        if not order:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-        serializer = OrderSerializer(order, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response({"status": "success", "data": serializer.data}, status=200)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            response = updateOrder(request, pk)
+            return Response(response, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_403_FORBIDDEN)
 
     def delete(self, request, pk, format=None):
-        order = self.get_object(pk)
-        if not order:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-        order.delete()
-        # return Response(status=status.HTTP_204_NO_CONTENT)
-        return Response({"status": "success", "data": "Order Record Deleted"}, status=200)
+        try:
+            response = deleteOrder(request, pk)
+            return Response(response, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_403_FORBIDDEN)
