@@ -36,9 +36,9 @@ def createCartItem(request):
         else:
             return {
                 "data": serializer.errors,
-                "status": 400,
+                "status": 404,
                 "message": "Something went wrong..!!",
-                "success": True,
+                "success": False,
             }
     except Exception as e:
         return {
@@ -63,9 +63,9 @@ def getCartItemDetail(request, pk):
         else :
             return {
                 "data": {},
-                "status": 400,
+                "status": 404,
                 "message": "CartItem not found.",
-                "success": True,
+                "success": False,
             }
     except Exception as e:
         return {
@@ -91,16 +91,16 @@ def updateCartItem(request, pk):
             else:
                 return {
                     "data": serializer.errors,
-                    "status": 400,
+                    "status": 404,
                     "message": "Something went wrong..!!",
-                    "success": True,
+                    "success": False,
                 }
         else:
             return {
                 "data": {},
-                "status": 400,
+                "status": 404,
                 "message": "CartItem not found.",
-                "success": True,
+                "success": False,
             }
     except Exception as e:
         return {
@@ -125,9 +125,9 @@ def deleteCartItem(request, pk):
         else:
             return {
                 "data": {},
-                "status": 400,
+                "status": 404,
                 "message": "CartItem not found.",
-                "success": True,
+                "success": False,
             }
     except Exception as e:
         return {
@@ -171,9 +171,9 @@ def createAddress(request):
         else:
             return {
                 "data": serializer.errors,
-                "status": 400,
+                "status": 404,
                 "message": "Something went wrong..!!",
-                "success": True,
+                "success": False,
             }
     except Exception as e:
         return {
@@ -198,9 +198,9 @@ def getAddressDetail(request, pk):
         else :
             return {
                 "data": {},
-                "status": 400,
+                "status": 404,
                 "message": "Address not found.",
-                "success": True,
+                "success": False,
             }
     except Exception as e:
         return {
@@ -227,16 +227,16 @@ def updateAddress(request, pk):
             else:
                 return {
                     "data": serializer.errors,
-                    "status": 400,
+                    "status": 404,
                     "message": "Something went wrong..!!",
-                    "success": True,
+                    "success": False,
                 }
         else:
             return {
                 "data": {},
-                "status": 400,
+                "status": 404,
                 "message": "Address not found.",
-                "success": True,
+                "success": False,
             }
     except Exception as e:
         return {
@@ -253,16 +253,16 @@ def deleteAddress(request, pk):
             address.delete()
             return {
                 "data": {},
-                "status": 200,
+                "status": 204,
                 "message": "Address Deleted Successfully.",
                 "success": True,
             }
         else:
             return {
                 "data": {},
-                "status": 400,
+                "status": 404,
                 "message": "Address not found.",
-                "success": True,
+                "success": False,
             }
     except Exception as e:
         return {
