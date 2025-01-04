@@ -6,3 +6,4 @@ django-cors-headers
 djangorestframework-simplejwt
 stripe
 python-dotenv
+six-1.17.0

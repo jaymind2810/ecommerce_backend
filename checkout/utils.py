@@ -212,8 +212,7 @@ def getAddressDetail(request, pk):
 
 def updateAddress(request, pk):
     try: 
-        user = User.objects.get(id=pk)
-        address = Address.objects.filter(user=user.id)
+        address = Address.objects.get(id=pk)
         if address:
             serializer = AddressSerializer(address, data=request.data, partial=True)
             if serializer.is_valid():
