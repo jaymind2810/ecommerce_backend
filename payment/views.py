@@ -11,8 +11,11 @@ from .serializers import PaymentSerializer
 from .serializers import PaymentSerializer, AllPaymentItemsSerializer
 from decimal import Decimal
 import os
-
-stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
+from .utils import (
+    createStripeCustomer,
+    retriveCustomerPaymentMethods,
+    deleteCustomerPaymentMethods
+)    
 
 
 @api_view(['POST'])
@@ -72,13 +75,27 @@ def create_payment(request):
 @api_view(['POST'])
 def create_stripe_customer(request):
     try:
-        print("In Create create_stripe_customer-------")
-        data = request.data
-        print(data)
-
+        response = createStripeCustomer(request)
+        return Response(response, status=status.HTTP_200_OK)
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_403_FORBIDDEN)
 
+
+@api_view(['POST'])
+def retrive_customer_paymentMethods(request):    
+    try:
+        response = retriveCustomerPaymentMethods(request)
+        return Response(response, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_403_FORBIDDEN)
+    
+@api_view(['DELETE'])
+def delete_customer_paymentMethods(request):    
+    try:
+        response = deleteCustomerPaymentMethods(request)
+        return Response(response, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_403_FORBIDDEN)
 
 
 @api_view(['POST'])

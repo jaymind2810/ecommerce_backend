@@ -17,6 +17,7 @@ class User(AbstractUser):
     personal_address = models.TextField(max_length=200, blank=True, default='-')
     city = models.CharField(max_length=20, blank=True, default='-')
     user_photo = models.ImageField(upload_to='users/', blank=True, default='users/avatar-3.jpg')
+    user_stripe_id = models.CharField(max_length=20, blank=True, null=True)
     is_delete = models.BooleanField(max_length=20, default=False)
 
     def save(self, *args, **kwargs):
