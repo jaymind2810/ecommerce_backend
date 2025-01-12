@@ -21,6 +21,7 @@ class ProductAdmin(admin.ModelAdmin):
     # list_editable = ('publish_status',)
     search_fields = ('id', 'name', 'short_text', 'product_sequence', 'create_date', 'category_id', 'create_by')
     list_filter = ('category_id', 'create_by', 'publish_status')
+    save_as = True
     inlines = [ProductImageInline]
 
     fieldsets = [
