@@ -51,13 +51,3 @@ class OrderItem(models.Model):
 
     def __str__(self):
         return f"{self.product.name} (x{self.quantity}) - {self.order.id}"
-
-# class OrderItemThrough(models.Model):
-#     """
-#     Through model for order-item relationship (optional for customization).
-#     """
-#     order_id = models.ForeignKey(Order, on_delete=models.CASCADE)
-#     order_item_id = models.ForeignKey(OrderItem, on_delete=models.CASCADE)
-
-#     class Meta:
-#         unique_together = (('order_id', 'order_item_id'),)  # Ensure only one entry per order-item combination
