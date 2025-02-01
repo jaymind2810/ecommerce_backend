@@ -43,6 +43,7 @@ class OrderDetailAPIView(APIView):
     def get(self, request, pk, format=None):
         try:
             response = getOrderDetail(request, pk)
+            print(response, "---------Response---------")
             return Response(response, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_403_FORBIDDEN)

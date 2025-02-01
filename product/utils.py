@@ -1,16 +1,54 @@
-from product.models import Product
-from product.serializers import ProductAlldataSerializer, ProductSerializer
+from math import ceil
+from product.models import Product, Category
+from product.serializers import ProductAlldataSerializer, ProductSerializer, CategorySerializer
+from django.db.models import Q
 
 
 def getAllProducts(request):
-    try:
-        products = Product.objects.all()
-        serializer = ProductSerializer(products, many=True)
+    try:        
+        # Sorting
+        order = request.GET.get('sort', 'create_date')
+
+        # Filtering by categories
+        categories = request.GET.getlist('categories[]', [])
+        if categories:
+            products = Product.objects.filter(category_id__name__in=categories).order_by(order)
+        else:
+            products = Product.objects.all().order_by(order)
+
+        # Search query
+        search_query = request.GET.get('q', '')
+        if search_query:
+            products = products.filter(
+                Q(name__icontains=search_query) | Q(description__icontains=search_query)
+            )
+
+            
+        page = int(request.GET.get('page', 1))
+        page_size = int(request.GET.get('page_size', 10))
+        total_count = products.count()
+
+        start = (page - 1) * page_size
+        end = start + page_size
+
+        paginated_products = products[start:end]
+
+        serializer = ProductSerializer(paginated_products, many=True)
+
+        # Determine if there's more data
+        has_more = end < total_count
         return {
             "data": serializer.data,
             "status": 200,
             "message": "All Products",
             "success": True,
+            "pagination": {
+                "current_page": page,
+                "page_size": page_size,
+                "total_count": total_count,
+                "total_pages": ceil(total_count / page_size),
+                "has_more": has_more,
+            }
         }
     
     except Exception as e:
@@ -171,3 +209,23 @@ def getAllRelatedProducts(request):
             "message": "Somthing went wrong",
             "success": False,
         }
+    
+def getAllCategories(request):
+    try:
+        categories = Category.objects.all()
+        serializer = CategorySerializer(categories, many=True)
+        return {
+            "data": serializer.data,
+            "status": 200,
+            "message": "All Categories",
+            "success": True,
+        }
+    
+    except Exception as e:
+        return {
+            "data": {},
+            "status": 500,
+            "message": "Somthing went wrong",
+            "success": False,
+        }
+

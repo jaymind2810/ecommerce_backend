@@ -1,4 +1,6 @@
 from rest_framework.authtoken.models import Token 
+from order.serializers import NewOrderSerializer
+from order.models import Order
 from product.models import Product
 from product.serializers import ProductSerializer
 from .models import User
@@ -21,10 +23,14 @@ def getUserAllData(pk):
         carts = CartItem.objects.filter(user=pk)
         cart_items = CartItemSerializer(carts, many=True)
 
+        orders_datas = Order.objects.filter(customer=pk)
+        user_orders = NewOrderSerializer(orders_datas, many=True)
+
         all_user_data = {
             'user' : userData.data,
             'address_details' : addressData.data,
             'cart_items' : cart_items.data,
+            'user_orders' : user_orders.data,
         }
 
         return {

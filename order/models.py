@@ -1,11 +1,10 @@
 from django.db import models
 from account.models import User
 from product.models import Product
+from checkout.models import Address
 
 class Order(models.Model):
     
-    # Order identification and metadata
-    order_id = models.CharField(max_length=50, unique=True, primary_key=True)
     customer = models.ForeignKey('account.User', on_delete=models.CASCADE, related_name='orders')  # User who placed the order
     created_at = models.DateTimeField(auto_now_add=True)  # Timestamp of order creation
     updated_at = models.DateTimeField(auto_now=True)  # Timestamp of last update
@@ -13,6 +12,7 @@ class Order(models.Model):
     # Order status and tracking
     STATUS_CHOICES = (
         ('pending', 'Pending'),
+        ('confirm', 'Confirm'),
         ('processing', 'Processing'),
         ('shipped', 'Shipped'),
         ('delivered', 'Delivered'),
@@ -23,19 +23,19 @@ class Order(models.Model):
     tracking_number = models.CharField(max_length=50, blank=True, null=True) 
 
     # Billing and shipping information
-    billing_address = models.TextField()  # Can be structured with separate fields for street address, city, state, etc.
-    shipping_address = models.TextField()  # Can be structured with separate fields for better organization
+    address = models.ForeignKey(Address, on_delete=models.CASCADE, null=True, blank=True)
 
     # Payment details
     payment_method = models.CharField(max_length=50)  # Can be extended to include a ForeignKey to a Payment model for more complex scenarios
     payment_confirmed = models.BooleanField(default=False)
 
+    amount_pay = models.DecimalField(default=0.00, max_digits=10, decimal_places=2)
     # Order items
     # items = models.ManyToManyField('OrderItem', through='OrderItemThrough')
 
 
-    def __str__(self):
-        return f"Order #{self.order_id} - {self.customer.username} ({self.status})"
+    # def __str__(self):
+    #     return f"Order #{self.order_id} - {self.customer.username} ({self.status})"
 
 class OrderItem(models.Model):
     """
@@ -50,7 +50,7 @@ class OrderItem(models.Model):
         return self.quantity * self.unit_price
 
     def __str__(self):
-        return f"{self.product.name} (x{self.quantity}) - {self.order.order_id}"
+        return f"{self.product.name} (x{self.quantity}) - {self.order.id}"
 
 # class OrderItemThrough(models.Model):
 #     """

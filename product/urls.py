@@ -11,7 +11,7 @@ urlpatterns = [
     path('products/<int:pk>/', ProductDetailAPIView.as_view()),
     path('products/trending/', TrendingProductListAPIView.as_view()),
     path('products/related/', RelatedProductListAPIView.as_view()),
-
+    path('categories/', CategoryListAPIView.as_view()),
 ]
 
 if settings.DEBUG:  # new

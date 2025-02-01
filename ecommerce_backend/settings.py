@@ -89,6 +89,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         # 'NAME': BASE_DIR / 'db.sqlite3',
         'NAME': 'ecommerce_react',
+        # 'NAME': 'ecommerce_react1',
         'USER':'postgres',
         'PASSWORD':'postgres',
         'HOST':'localhost',

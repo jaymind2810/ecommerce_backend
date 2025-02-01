@@ -1,5 +1,6 @@
-from order.serializers import OrderSerializer
-from order.models import Order
+from account.models import User
+from order.serializers import NewOrderSerializer, OrderSerializer
+from order.models import Order, OrderItem
 
 
 def getAllOrders(request):
@@ -23,22 +24,52 @@ def getAllOrders(request):
     
 def createOrder(request):
     try: 
-        serializer = OrderSerializer(data=request.data)
+        # Extract and prepare order data from the request
+        order_items = request.data.get('order_items', [])
+        customer = request.data.get('user')
+        address = request.data.get('address', {})
+        amount = request.data.get('amount')
+        payment_method = request.data.get('payment_method')
+
+        # Construct the order data
+        order_data = {
+            "customer": customer,
+            "status": "confirm",
+            "address": address.get("id"),
+            "amount_pay": float(amount) if amount else 0.0,
+            "payment_method": payment_method,
+            "payment_confirmed": True,
+            "items": [
+                {
+                    "product": item.get("product", {}).get("id"),
+                    "quantity": item.get("quantity"),
+                    "unit_price": float(item.get("product", {}).get("unit_price", 0.0))
+                }
+                for item in order_items
+            ]
+        }
+
+
+        # Serialize the order data
+        serializer = OrderSerializer(data=order_data)
+
+        # Validate and save the order
         if serializer.is_valid():
-            serializer.save()
+            order = serializer.save()
+            new_serializer = NewOrderSerializer(order)
             return {
-                "data": serializer.data,
+                "data": new_serializer.data,
                 "status": 200,
                 "message": "Order Created Successfully.",
                 "success": True,
-            }
+            }            
         else:
             return {
-                "data": serializer.errors,
-                "status": 400,
-                "message": "Something went wrong..!!",
-                "success": True,
-            }
+                    "data": serializer.errors,
+                    "status": 400,
+                    "message": "Validation failed.",
+                    "success": False,
+                }
     except Exception as e:
         return {
             "data": {},
@@ -49,13 +80,20 @@ def createOrder(request):
 
 def getOrderDetail(request, pk):
     try: 
-        Order = Order.objects.get(pk=pk)
+        user_id = request.data.get('user_id')
+        user = User.objects.get(id=user_id)
+        # order_id = request.data.get('order_id')
+        print(user.orders, "======= User Orders =======")
+        # Order_data = Order.objects.get(customer=user.id, pk=pk)
+       
+        # address = Address.objects.filter(user=user.id)
+        # print(Order_data, "--------Order-----")
         if Order:
-            serializer = OrderSerializer(Order)
+            # serializer = NewOrderSerializer(Order_data)
             return {
-                "data": serializer.data,
+                # "data": serializer.data,
                 "status": 200,
-                "message": "Order Created Successfully.",
+                "message": "Order Fatch Successfully.",
                 "success": True,
             }
         else :
@@ -63,7 +101,7 @@ def getOrderDetail(request, pk):
                 "data": {},
                 "status": 400,
                 "message": "Order not found.",
-                "success": True,
+                "success": False,
             }
     except Exception as e:
         return {

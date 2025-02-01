@@ -10,6 +10,7 @@ from .utils import (
     deleteProduct,
     getAllTrendingProducts,
     getAllRelatedProducts,
+    getAllCategories
 )
 
 
@@ -79,6 +80,23 @@ class RelatedProductListAPIView(APIView):
     def get(self, request):
         try:
             response = getAllRelatedProducts(request)
+            return Response(response, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_403_FORBIDDEN)
+
+
+class CategoryListAPIView(APIView):
+    """
+    API endpoint for listing and creating categories.
+    """
+    # permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
+        """
+        Retrieves a list of all categories.
+        """
+        try:
+            response = getAllCategories(request)
             return Response(response, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_403_FORBIDDEN)
