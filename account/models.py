@@ -51,6 +51,7 @@ class Main(models.Model):
 
     set_name = models.CharField(default="Site Settings", max_length=128)
 
+    is_delete = models.BooleanField(default=False)
     create_date = models.DateTimeField(auto_now_add=True, editable=False, blank=True, null=True)
     last_modified = models.DateTimeField(auto_now=True, editable=False, blank=True, null=True)
 

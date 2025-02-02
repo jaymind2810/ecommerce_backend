@@ -299,10 +299,10 @@ def createStripePaymentRecord(request):
         data = request.data
         print(data, "======Data-------------")
 
-        cart_items_data = data['cart_items']
+        cart_items_data = data.get('cart_items', [])
         res_data = {}
 
-        amount_total = data['amount']
+        amount_total = data.get('amount', 0)
         if 'user_id' in data:
             user = User.objects.get(id=data['user_id'])
 
@@ -313,36 +313,45 @@ def createStripePaymentRecord(request):
         #         is_promocode_used = True
         #         break
 
-        order_data = data['order']
+        order_data = data.get('order')
+        if not order_data:
+            return {
+                "data": {},
+                "status": 400,
+                "message": "Invalid order data",
+                "success": False,
+            }
+        
         order = get_object_or_404(Order, id=order_data['id'])
         if order_data:
-            order.status == "confirm"
-            order.payment_confirmed == True
+            order.status = "confirm"
+            order.payment_confirmed = True
             order.save()
 
             cart_item_ids = [item.get("id") for item in cart_items_data]
-            if len(cart_item_ids) >= 1:
-                cart_items = CartItem.objects.filter(id__in=cart_item_ids)
-                cart_items.delete()
+            if cart_item_ids:
+                CartItem.objects.filter(id__in=cart_item_ids).delete()
 
             new_order_serializer = NewOrderSerializer(order)
             res_data['order'] = new_order_serializer.data
+        
         payment_record_data = {
-            'amount': Decimal(amount_total),
+            'amount': Decimal(str(amount_total)),
             'user': user,
-            'status': "done" if data['status'] == "DONE" else "fail",
-            'currency':"usd",
+            'status': "done" if data.get('status') == "DONE" else "fail",
+            'currency': "usd",
             'payment_method': 'stripe',
             'is_promocode_used': is_promocode_used,
-            'transaction_id' : data['payment_refrence_id'],
-            'customer_id': data['customer_id'],
+            'transaction_id': data.get('payment_refrence_id'),
+            'customer_id': data.get('customer_id'),
             'order': order,
-            'payment_method_id': data['payment_method_id'],
+            'payment_method_id': data.get('payment_method_id'),
         }
-        
 
         payment_record = Payment(**payment_record_data)
         payment_record.save()
+
+        print(payment_record, "--------_Payment Recordpppp")
 
         payment_serializer = PaymentSerializer(payment_record)
         res_data['payment'] = payment_serializer.data
