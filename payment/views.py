@@ -14,63 +14,10 @@ import os
 from .utils import (
     createStripeCustomer,
     retriveCustomerPaymentMethods,
-    deleteCustomerPaymentMethods
-)    
-
-
-@api_view(['POST'])
-def create_payment(request):
-    # ============ Using Stripe ===============
-    try:
-        data = request.data
-        # total_amount = 0
-        is_promocode_used=False
-        for item in data['order_items']:
-            promo_code = item.get('promo_code')
-            if promo_code is not None:
-                is_promocode_used = True
-                break
-
-        amount_total = data['amount']
-        customer_id = None
-
-        if 'user_id' in data:
-            user = User.objects.get(id=data['user_id'])
-            name = user.name
-            email = user.email
-            customer = stripe.Customer.create(
-                name=name,
-                email=email,
-            )
-            customer_id = customer['id']
-
-
-        intent = stripe.PaymentIntent.create( 
-            amount=amount_total * 100,
-            currency="usd",
-            automatic_payment_methods={
-                "enabled": True,
-                "allow_redirects":"always"
-            },
-            customer= customer_id
-        )
-
-        payment_record_data = {
-            'amount': Decimal(amount_total),
-            'user': user,
-            'status': "PENDING",
-            'currency':"usd",
-            'payment_method': 'Stripe',
-            'is_promocode_used': is_promocode_used,
-            'payment_refrence_id' : intent['id'],
-            'customer_id': customer_id
-        }
-        payment_record_id = Payment(**payment_record_data)
-        payment_record_id.save()
-
-        return Response(intent)
-    except Exception as e:
-        return Response({'error': str(e)}, status=status.HTTP_403_FORBIDDEN)
+    deleteCustomerPaymentMethods,
+    createStripePaymentIntent,
+    createStripePaymentRecord
+)
 
 @api_view(['POST'])
 def create_stripe_customer(request):
@@ -96,6 +43,25 @@ def delete_customer_paymentMethods(request):
         return Response(response, status=status.HTTP_200_OK)
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_403_FORBIDDEN)
+    
+
+@api_view(['POST'])
+def create_stripe_payment_intent(request):
+    try:
+        response = createStripePaymentIntent(request)
+        return Response(response, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_403_FORBIDDEN)
+
+
+@api_view(['POST'])
+def create_stripe_payment_record(request):
+    try:
+        response = createStripePaymentRecord(request)
+        return Response(response, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_403_FORBIDDEN)
+
 
 
 @api_view(['POST'])

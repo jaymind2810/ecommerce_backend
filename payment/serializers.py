@@ -9,14 +9,8 @@ class PaymentSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-# class OrderItemsSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = OrderItems
-#         fields = '__all__'
-
 
 class AllPaymentItemsSerializer(serializers.ModelSerializer):
-    # order_items = OrderItemsSerializer(many=True)
     class Meta:
         model = Payment
-        fields = ['user', 'payment_refrence_id', 'status', 'amount', 'currency']
+        fields = ['user', 'transaction_id', 'status', 'amount', 'currency']

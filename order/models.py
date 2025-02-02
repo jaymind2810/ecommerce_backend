@@ -6,8 +6,6 @@ from checkout.models import Address
 class Order(models.Model):
     
     customer = models.ForeignKey('account.User', on_delete=models.CASCADE, related_name='orders')  # User who placed the order
-    created_at = models.DateTimeField(auto_now_add=True)  # Timestamp of order creation
-    updated_at = models.DateTimeField(auto_now=True)  # Timestamp of last update
 
     # Order status and tracking
     STATUS_CHOICES = (
@@ -30,6 +28,9 @@ class Order(models.Model):
     payment_confirmed = models.BooleanField(default=False)
 
     amount_pay = models.DecimalField(default=0.00, max_digits=10, decimal_places=2)
+
+    created_at = models.DateTimeField(auto_now_add=True)  # Timestamp of order creation
+    updated_at = models.DateTimeField(auto_now=True)  # Timestamp of last update
     # Order items
     # items = models.ManyToManyField('OrderItem', through='OrderItemThrough')
 
