@@ -1,4 +1,7 @@
+from decimal import Decimal
 from account.models import User
+from payment.serializers import PaymentSerializer
+from payment.models import Payment
 from order.serializers import NewOrderSerializer, OrderSerializer
 from order.models import Order, OrderItem
 from checkout.models import CartItem
@@ -26,8 +29,8 @@ def getAllOrders(request):
 def createOrder(request):
     try: 
         # Extract and prepare order data from the request
+        res_data = {}
         cart_items = request.data.get('order_items', [])
-        print(cart_items, "---- Cart Items ------------")
         customer = request.data.get('user')
         address = request.data.get('address', {})
         amount = request.data.get('amount')
@@ -40,7 +43,7 @@ def createOrder(request):
             "address": address.get("id"),
             "amount_pay": float(amount) if amount else 0.0,
             "payment_method": payment_method,
-            "payment_confirmed": True,
+            "payment_confirmed": False,
             "items": [
                 {
                     "product": item.get("product", {}).get("id"),
@@ -58,15 +61,39 @@ def createOrder(request):
         # Validate and save the order
         if serializer.is_valid():
             order = serializer.save()
+            
+            user = User.objects.get(id=customer)
+
+            # Create Payment record ..
+            payment_record_data = {
+                'amount': Decimal(str(amount)),
+                'user': user,
+                'status': "pending",
+                'currency': "usd",
+                'payment_method': 'cod',
+                'is_promocode_used': False,
+                # 'transaction_id': data.get('payment_refrence_id'),
+                # 'customer_id': data.get('customer_id'),
+                'order': order,
+                # 'payment_method_id': data.get('payment_method_id'),
+            }
+
+            payment_record = Payment(**payment_record_data)
+            payment_record.save()
+
+            payment_serializer = PaymentSerializer(payment_record)
+            res_data['payment'] = payment_serializer.data
+
+            new_serializer = NewOrderSerializer(order)
+            res_data['order'] = new_serializer.data
 
             cart_item_ids = [item.get("id") for item in cart_items]
             if len(cart_item_ids) >= 1:
                 cart_items = CartItem.objects.filter(id__in=cart_item_ids)
                 cart_items.delete()
 
-            new_serializer = NewOrderSerializer(order)
             return {
-                "data": new_serializer.data,
+                "data": res_data,
                 "status": 200,
                 "message": "Order Created Successfully.",
                 "success": True,

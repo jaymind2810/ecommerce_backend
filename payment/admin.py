@@ -9,13 +9,14 @@ class PaymentAdmin(admin.ModelAdmin):
     list_display_links = ('id', 'user', 'payment_method')
     list_filter = ('status','payment_method',)
     search_fields = ('user__username',)
+    readonly_fields = ['customer_id', 'transaction_id', 'payment_method_id', 'amount',]
 
     fieldsets = [
         ('Payment info', {
             'fields': ['user', 'order', 'amount', "status", 'payment_method']
         }),
         ('Other Details', {
-            'fields': ['transaction_id', 'payment_method_id', 'currency','is_promocode_used', 'promocode_amount'],
+            'fields': ['customer_id', 'transaction_id', 'payment_method_id', 'currency', 'is_promocode_used', 'promocode_amount'],
             'classes': ['wide',],
             'description': 'Payment details of the model.',
         }),
