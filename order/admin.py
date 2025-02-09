@@ -12,7 +12,7 @@ class OrderItemInline(admin.TabularInline):
 class OrderAdmin(admin.ModelAdmin):
     
     inlines = [OrderItemInline]
-    list_display = ('id', 'customer', 'status', 'amount_pay', 'created_at')  # Add a custom method for total amount
+    list_display = ('id', 'customer', 'status', 'amount_pay', 'payment_method', 'payment_confirmed', 'created_at')  # Add a custom method for total amount
     list_display_links = ('id', 'customer', 'amount_pay')
     list_filter = ('status', 'created_at')
     search_fields = ('id', 'customer__username')  # Search by order ID and customer username
