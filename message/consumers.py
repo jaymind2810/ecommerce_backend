@@ -1,7 +1,7 @@
 from channels.generic.websocket import AsyncWebsocketConsumer
 import json
 
-class AccountConsumer(AsyncWebsocketConsumer):
+class MessageConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         print("----Connected-------")
         await self.accept()
