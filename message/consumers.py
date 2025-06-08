@@ -11,5 +11,4 @@ class MessageConsumer(AsyncWebsocketConsumer):
         print("WebSocket disconnected", close_code)
 
     async def receive(self, text_data):
-        print("===> Received", text_data)
         await self.send(text_data=json.dumps({"message": "Received", "data": text_data}))

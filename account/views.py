@@ -17,6 +17,7 @@ from rest_framework_simplejwt.views import (
 )
 
 from .utils import (
+    getAllUsers,
     getUserAllData,
     getAllHomePageData,
     registerUser,
@@ -83,6 +84,15 @@ def getAllData(self, pk):
         return Response(response, status=status.HTTP_200_OK)
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_403_FORBIDDEN)
+    
+class UserListAllData(APIView):
+    # permission_classes = (IsAuthenticated,)
+    def get(self, request):
+        try:
+            response = getAllUsers(request)
+            return Response(response, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_403_FORBIDDEN)
     
 
 class HomePageAllData(APIView):

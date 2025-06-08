@@ -7,35 +7,41 @@ from django.db.models import Q
 
 def getAllMessages(request):
     try:
-        print(request.GET, "--request data------")
         sender = request.GET.get('sender')
-        reciever = request.GET.get('reciever')
-        print(sender, reciever, "------sender -----reciever-------")
-        messages = Message.objects.filter((Q(sender=sender), Q(reciever=reciever)) | (Q(sender=reciever), Q(reciever=sender))).order_by('-created_at')
+        receiver = request.GET.get('receiver')
 
-        print(messages, "------messages========")
+        print(sender, "--------sender---receiver---", receiver)
 
-        # paginator = Paginator(messages, 10)  # Show 10 messages per page
-        # page_number = request.GET.get('page')  # Get the page number from the request
-        # page_obj = paginator.get_page(page_number)
+        if not sender or not receiver:
+            return {
+                "data": {},
+                "status": 400,
+                "message": "Both sender and receiver IDs are required.",
+                "success": False,
+            }
 
-        
-        # messages = Message.objects.filter(sender=user_id) | Message.objects.filter(receiver=user_id)
-        serializer = MessageSerializer(messages, many=True)
+        messages = Message.objects.filter(
+            Q(sender_id=sender, receiver_id=receiver) |
+            Q(sender_id=receiver, receiver_id=sender)
+        ).order_by('-created_at')
+
+        serializer = MessageSerializer(instance=messages, many=True)
+
         return {
             "data": serializer.data,
             "status": 200,
             "message": "All Messages",
             "success": True,
         }
+
     except Exception as e:
+        print("Error:", e)
         return {
             "data": {},
             "status": 500,
             "message": "Something went wrong",
             "success": False,
         }
-
 def createMessage(request):
     try:
         serializer = MessageSerializer(data=request.data)

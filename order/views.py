@@ -39,7 +39,7 @@ class OrderListAPIView(APIView):
 
 
 class OrderDetailAPIView(APIView):
-    # permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated,)
     def get(self, request, pk, format=None):
         try:
             response = getOrderDetail(request, pk)

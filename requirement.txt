@@ -9,3 +9,5 @@ python-dotenv
 six
 channels
 daphne
+redis-server
+channels_redis

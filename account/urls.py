@@ -18,6 +18,7 @@ urlpatterns = [
     # ============= Users Api================
     path('auth/user/', UserRetrieveUpdateAPIView.as_view(), name='user_profile'),
     path('auth/getuseralldata/<int:pk>/', getAllData, name='getAllData'),
+    path('auth/getAllUsers/', UserListAllData.as_view() , name='getAllUsersData'),
 
     # =============== HomePage WebPanel Api ================
     path('homePage/allData/', HomePageAllData.as_view()),

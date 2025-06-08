@@ -8,6 +8,7 @@ from checkout.models import Address, CartItem
 from .serializers import (
     RegisterSerializer,
     UserSerializer,
+    allUserSerializer,
 )
 from checkout.serializers import AddressSerializer, CartItemSerializer
 from django.contrib.auth import authenticate, login
@@ -135,6 +136,26 @@ def registerUser(request):
             "message": "Somthing went wrong",
             "success": False,
         }
+    except Exception as e:
+        return {
+            "data": {},
+            "status": 500,
+            "message": "Somthing went wrong",
+            "success": False,
+        }
+    
+
+def getAllUsers(request):
+    try:
+        usersData = User.objects.all()
+        serializerData = allUserSerializer(instance=usersData, many=True)
+        return {
+            "data": serializerData.data,
+            "status": 200,
+            "message": "All users Data",
+            "success": True,
+        }
+    
     except Exception as e:
         return {
             "data": {},
