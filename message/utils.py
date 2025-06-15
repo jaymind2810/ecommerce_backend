@@ -1,6 +1,6 @@
 from decimal import Decimal
 from account.models import User
-from .serializers import MessageSerializer
+from .serializers import MessageSerializer, MessageUserSerializer
 from .models import Message
 from django.db.models import Q
 
@@ -9,8 +9,11 @@ def getAllMessages(request):
     try:
         sender = request.GET.get('sender')
         receiver = request.GET.get('receiver')
+        page = int(request.GET.get('page'))
+        page_size = int(request.GET.get('page_size'))
 
-        print(sender, "--------sender---receiver---", receiver)
+        offset = (page - 1) * page_size
+        message_data_dict = {}
 
         if not sender or not receiver:
             return {
@@ -23,12 +26,22 @@ def getAllMessages(request):
         messages = Message.objects.filter(
             Q(sender_id=sender, receiver_id=receiver) |
             Q(sender_id=receiver, receiver_id=sender)
-        ).order_by('-created_at')
+        ).order_by('-created_at')[offset:offset+page_size]
 
-        serializer = MessageSerializer(instance=messages, many=True)
+        messagesserializer = MessageSerializer(instance=messages, many=True)
+
+        receiver_user = User.objects.get(pk=receiver)
+        receiverUser = MessageUserSerializer(instance=receiver_user)
+        sender_user = User.objects.get(pk=sender)
+        senderUser = MessageUserSerializer(instance=sender_user)
+
+        message_data_dict['messages'] = messagesserializer.data[::-1]
+        message_data_dict['has_more'] = len(messages) == page_size
+        message_data_dict['receiver_user'] = receiverUser.data
+        message_data_dict['sender_user'] = senderUser.data
 
         return {
-            "data": serializer.data,
+            "data": message_data_dict,
             "status": 200,
             "message": "All Messages",
             "success": True,

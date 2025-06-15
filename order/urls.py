@@ -9,6 +9,7 @@ urlpatterns = [
     # # =========== Orders API ==================
     path('orders/', OrderListAPIView.as_view()),
     path('orders/<int:pk>/', OrderDetailAPIView.as_view()),
+    path('all/orders/', AdminOrderListAPIView.as_view()),
 
 ]
 

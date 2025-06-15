@@ -32,3 +32,10 @@ class Message(models.Model):
 
     def __str__(self):
         return str(self.sender)
+    
+
+class VideoCall(models.Model):
+    caller = models.ForeignKey(User, related_name='calls_made', on_delete=models.CASCADE)
+    receiver = models.ForeignKey(User, related_name='calls_received', on_delete=models.CASCADE)
+    is_active = models.BooleanField(default=True)
+    started_at = models.DateTimeField(auto_now_add=True)

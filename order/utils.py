@@ -1,10 +1,12 @@
 from decimal import Decimal
+from math import ceil
 from account.models import User
 from payment.serializers import PaymentSerializer
 from payment.models import Payment
-from order.serializers import NewOrderSerializer, OrderSerializer
+from order.serializers import AdminOrderSerializer, NewOrderSerializer, OrderSerializer
 from order.models import Order, OrderItem
 from checkout.models import CartItem
+from django.db.models import Q
 
 
 def getAllOrders(request):
@@ -200,3 +202,56 @@ def deleteOrder(request, pk):
             "message": "Somthing went wrong",
             "success": False,
         }
+    
+
+def getAdminAllOrders(request):
+    try:
+        # Sorting
+        order = request.GET.get('sort', 'created_at')
+
+        # Filtering by categories
+        orders = Order.objects.all().order_by(order)
+        # Search query
+        search_query = request.GET.get('q', '')
+        if search_query:
+            orders = orders.filter(
+                # Q(name__icontains=search_query) | Q(description__icontains=search_query)
+                Q(customer__first_name__in=search_query) | Q(customer__last_name__in=search_query)
+            )
+
+        page = int(request.GET.get('page', 1))
+        page_size = int(request.GET.get('page_size', 10))
+        total_count = orders.count()
+
+        start = (page - 1) * page_size
+        end = start + page_size
+
+        paginated_orders = orders[start:end]
+
+        serializer = AdminOrderSerializer(paginated_orders, many=True)
+
+        # Determine if there's more data
+        has_more = end < total_count
+
+        return {
+            "data": serializer.data,
+            "status": 200,
+            "message": "All Orders",
+            "success": True,
+            "pagination": {
+                "current_page": page,
+                "page_size": page_size,
+                "total_count": total_count,
+                "total_pages": ceil(total_count / page_size),
+                "has_more": has_more,
+            },
+        }
+
+    except Exception as e:
+        return {
+            "data": {},
+            "status": 500,
+            "message": "Somthing went wrong",
+            "success": False,
+        }
+    

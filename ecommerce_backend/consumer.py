@@ -34,6 +34,8 @@ class SocketConsumer(AsyncWebsocketConsumer):
             await self.handle_chat(data)
         elif msg_type == "notification":
             await self.handle_notification(data)
+        elif msg_type == "rtc-signal":
+            await self.handle_rtc_signal(data)
 
     async def handle_chat(self, data):
         sender_id = self.user.id
@@ -42,7 +44,7 @@ class SocketConsumer(AsyncWebsocketConsumer):
         message = data.get("message")
 
         # Save Message
-        await self.save_message(sender_id, receiver_id, message)
+        messageData = await self.save_message(sender_id, receiver_id, message)
 
         # Send message to sender and receiver groups
         for uid in [sender_id, receiver_id]:
@@ -53,8 +55,7 @@ class SocketConsumer(AsyncWebsocketConsumer):
                     "message": message,
                     "from": sender_id,
                     "to": receiver_id,
-                    # "from": receiver_id,
-                    # "to": sender_id,
+                    "messageData" : messageData,
                 }
             )
 
@@ -70,12 +71,32 @@ class SocketConsumer(AsyncWebsocketConsumer):
             }
         )
 
+    async def handle_rtc_signal(self, data):
+        """
+        Handle WebRTC signaling (offer, answer, ICE candidates)
+        """
+        receiver_id = data.get("receiver_id")
+        signal_data = data.get("signal_data")
+
+        if not receiver_id or not signal_data:
+            return
+
+        await self.channel_layer.group_send(
+            f"user_{receiver_id}",
+            {
+                "type": "rtc_signal",
+                "from": self.user.id,
+                "signal_data": signal_data,
+            }
+        )
+
     async def chat_message(self, event):
         await self.send(text_data=json.dumps({
             "type": "chat",
             "message": event["message"],
             "from": event["from"],
-            "to": event["to"]
+            "to": event["to"],
+            "messageData": event["messageData"]
         }))
 
     async def broadcast_notification(self, event):
@@ -83,6 +104,13 @@ class SocketConsumer(AsyncWebsocketConsumer):
             "type": "notification",
             "message": event["message"],
             "from": event["from"]
+        }))
+
+    async def rtc_signal(self, event):
+        await self.send(text_data=json.dumps({
+            "type": "rtc-signal",
+            "from": event["from"],
+            "signal_data": event["signal_data"]
         }))
 
     @database_sync_to_async
@@ -122,9 +150,14 @@ class SocketConsumer(AsyncWebsocketConsumer):
     @database_sync_to_async
     def save_message(self, sender_id, receiver_id, message_text):
         from message.models import Message  # adjust import path if needed
+        from message.serializers import MessageSerializer
 
-        return Message.objects.create(
+        message = Message.objects.create(
             sender_id=sender_id,
             receiver_id=receiver_id,
             message_text=message_text
         )
+
+        messageData = MessageSerializer(instance=message).data
+
+        return messageData

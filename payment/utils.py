@@ -351,12 +351,8 @@ def createStripePaymentRecord(request):
         payment_record = Payment(**payment_record_data)
         payment_record.save()
 
-        print(payment_record, "--------_Payment Recordpppp")
-
         payment_serializer = PaymentSerializer(payment_record)
         res_data['payment'] = payment_serializer.data
-
-        print(res_data, "====res_datares_datares_datares_data")
 
         if res_data:
             return {

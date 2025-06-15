@@ -1,3 +1,4 @@
+from account.serializers import allUserSerializer
 from rest_framework import serializers
 
 from checkout.serializers import AddressSerializer
@@ -48,6 +49,16 @@ class NewOrderItemSerializer(serializers.ModelSerializer):
 class NewOrderSerializer(serializers.ModelSerializer):
     items = NewOrderItemSerializer(many=True, source='order_items')
     address = AddressSerializer()
+
+    class Meta:
+        model = Order
+        fields = ["id", "customer", "status", "address", "payment_method", "payment_confirmed", "amount_pay", "updated_at", "created_at", "items"]
+
+
+class AdminOrderSerializer(serializers.ModelSerializer):
+    items = NewOrderItemSerializer(many=True, source='order_items')
+    address = AddressSerializer()
+    customer = allUserSerializer()
 
     class Meta:
         model = Order
